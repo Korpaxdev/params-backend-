@@ -8,7 +8,12 @@ services:
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_USER_PASSWORD}
     volumes:
-      - ./database:/var/lib/postgres/
+      - ./database:/var/lib/postgresql/data
+    healthcheck:
+      test: "pg_isready -d ${DB_NAME} -U ${DB_USER}"
+      interval: 5s
+      timeout: 10s
+      retries: 120
   redis:
     image: redis:alpine
     ports:
