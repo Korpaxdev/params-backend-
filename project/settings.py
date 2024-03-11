@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
+from datetime import timedelta
 from pathlib import Path
 
 from project.utils import EnvSettings
@@ -129,4 +130,14 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 AUTH_USER_MODEL = "users.UserModel"
 
+# Rest Framework settings
 REST_FRAMEWORK = {"DEFAULT_AUTHENTICATION_CLASSES": ("rest_framework_simplejwt.authentication.JWTAuthentication",)}
+
+# Simple JWT settings
+SIMPLE_JWT = {"ACCESS_TOKEN_LIFETIME": ENV_SETTINGS.ACCESS_TOKEN_LIFETIME}
+
+# CELERY
+
+CELERY_BROKER_URL = ENV_SETTINGS.CELERY_BROKER_URL
+CELERY_RESULT_BACKEND = ENV_SETTINGS.CELERY_RESULT_BACKEND
+CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True

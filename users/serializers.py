@@ -16,4 +16,8 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = get_user_model()
         fields = ("id", "username", "email", "password")
-        extra_kwargs = {"password": {"write_only": True}}
+        extra_kwargs = {"password": {"write_only": True}, "id": {"read_only": True}}
+
+
+class PasswordResetSerializer(serializers.Serializer):
+    email = serializers.EmailField(write_only=True)
