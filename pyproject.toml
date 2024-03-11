@@ -12,6 +12,7 @@ djangorestframework = "^3.14.0"
 black = "^24.2.0"
 pydantic-settings = "^2.2.1"
 psycopg2-binary = "^2.9.9"
+djangorestframework-simplejwt = "^5.3.1"
 
 
 [build-system]
