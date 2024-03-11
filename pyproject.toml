@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "task2(o2rus)"
+version = "0.1.0"
+description = ""
+authors = ["korpaxdev <korpaxdev@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+django = "^5.0.3"
+djangorestframework = "^3.14.0"
+black = "^24.2.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.black]
+line-length = 120
