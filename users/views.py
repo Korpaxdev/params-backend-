@@ -2,7 +2,6 @@ from rest_framework import generics, permissions
 from rest_framework.response import Response
 
 from users.serializers import UserSerializer, PasswordResetSerializer
-from users.tasks import test_task
 
 
 # Create your views here.
@@ -24,7 +23,7 @@ class ResetPasswordView(generics.GenericAPIView):
     serializer_class = PasswordResetSerializer
 
     def post(self, request, *args, **kwargs):
-        serializer = self.get_serializer(data=request.data)
+        serializer: PasswordResetSerializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        test_task.delay()
-        return Response({"message": "Test Response"})
+        serializer.save()
+        return Response(serializer.data)

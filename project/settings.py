@@ -13,6 +13,8 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 from datetime import timedelta
 from pathlib import Path
 
+from typing_extensions import NamedTuple
+
 from project.utils import EnvSettings
 
 ENV_SETTINGS = EnvSettings()
@@ -141,3 +143,9 @@ SIMPLE_JWT = {"ACCESS_TOKEN_LIFETIME": ENV_SETTINGS.ACCESS_TOKEN_LIFETIME}
 CELERY_BROKER_URL = ENV_SETTINGS.CELERY_BROKER_URL
 CELERY_RESULT_BACKEND = ENV_SETTINGS.CELERY_RESULT_BACKEND
 CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
+
+# MESSAGES
+DEFAULT_PASSWORD_RESET_MESSAGE = (
+    "Сообщение с ссылкой для сброса пароля было отправлено на указанный email адрес.\n"
+    "Обратите внимание что данное сообщение будет отправлено в случае если такая учетная запись существует."
+)
