@@ -15,16 +15,17 @@ class CustomUserAdmin(UserAdmin):
 
 @admin.register(PasswordResetTokenModel)
 class PasswordResetTokenModelAdmin(admin.ModelAdmin):
-    readonly_fields = ("token", "created", "user", "is_expired")
-    list_display = ("token", "user", "created", "is_expired")
+    readonly_fields = ("token", "created", "is_expired")
+    list_display = ("token", "user", "created", "expired", "is_expired")
     search_fields = ("user__username", "user__email", "token")
     list_filter = (
         PasswordResetTokenIsExpiredFilter,
         "created",
     )
+    fields = ("token", "user", "created", "expired")
 
     IS_EXPIRED_DISPLAYED = {True: "Да", False: "Нет"}
 
     @admin.display(description="Истек")
-    def is_expired(self, obj):
-        return self.IS_EXPIRED_DISPLAYED[obj.is_expired]
+    def is_expired(self, instance: PasswordResetTokenModel):
+        return self.IS_EXPIRED_DISPLAYED.get(instance.is_expired)

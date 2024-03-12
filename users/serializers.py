@@ -1,10 +1,9 @@
 from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.contrib.auth.password_validation import validate_password
-from django.core.exceptions import ValidationError
 from rest_framework import serializers
 
-from users.models import PasswordResetTokenModel
+from project.utils import serializer_validate_password
+from users.models import PasswordResetTokenModel, UserModel
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -14,11 +13,7 @@ class UserSerializer(serializers.ModelSerializer):
 
     @staticmethod
     def validate_password(password: str):
-        try:
-            validate_password(password)
-        except ValidationError as error:
-            raise serializers.ValidationError(detail=error.messages)
-        return password
+        return serializer_validate_password(password)
 
     class Meta:
         model = get_user_model()
@@ -40,3 +35,21 @@ class PasswordResetSerializer(serializers.Serializer):
             return PasswordResetTokenModel.objects.create(user=user)
         except get_user_model().DoesNotExist:
             return
+
+
+class PasswordResetCompleteSerializer(serializers.ModelSerializer):
+
+    @staticmethod
+    def validate_password(password: str):
+        return serializer_validate_password(password)
+
+    def update(self, instance: UserModel, validated_data):
+        instance.set_password(validated_data["password"])
+        instance.save()
+        return instance
+
+    class Meta:
+        model = get_user_model()
+        fields = ("id", "username", "email", "password")
+        read_only_fields = ("id", "username", "email")
+        extra_kwargs = {"password": {"write_only": True}}

@@ -13,9 +13,10 @@ class PasswordResetTokenIsExpiredFilter(admin.SimpleListFilter):
 
     def queryset(self, request, queryset):
         value = self.value()
-        mapper = {"False": False, "True": True}
         if not value:
             return queryset
-        value = mapper[self.value()]
+        if isinstance(value, str):
+            mapper = {"True": True, "False": False}
+            value = mapper[value]
         ids = map(lambda model: model.pk, filter(lambda model: model.is_expired == value, queryset))
         return queryset.filter(id__in=ids)

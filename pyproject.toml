@@ -15,6 +15,7 @@ psycopg2-binary = "^2.9.9"
 djangorestframework-simplejwt = "^5.3.1"
 celery = "^5.3.6"
 redis = "^5.0.3"
+pydantic = {extras = ["email"], version = "^2.6.3"}
 
 
 [build-system]

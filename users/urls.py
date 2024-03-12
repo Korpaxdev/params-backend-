@@ -11,4 +11,9 @@ urlpatterns = (
     path("token/", TokenObtainPairView.as_view(), name="token_obtain"),
     path("token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
     path("password/reset/", views.ResetPasswordView.as_view(), name="password_reset"),
+    path(
+        "password/reset/complete/<uuid:token>/",
+        views.ResetPasswordCompleteView.as_view(),
+        name="password_reset_complete",
+    ),
 )
