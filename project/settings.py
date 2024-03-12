@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
+    "django.contrib.sites",
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "rest_framework",
@@ -155,8 +156,12 @@ EMAIL_HOST = ENV_SETTINGS.EMAIL_HOST
 EMAIL_PORT = ENV_SETTINGS.EMAIL_PORT
 EMAIL_HOST_USER = ENV_SETTINGS.EMAIL_HOST_USER
 EMAIL_HOST_PASSWORD = ENV_SETTINGS.EMAIL_HOST_PASSWORD
+
 # MESSAGES
 DEFAULT_PASSWORD_RESET_MESSAGE = (
     "Сообщение с ссылкой для сброса пароля было отправлено на указанный email адрес.\n"
     "Обратите внимание что данное сообщение будет отправлено в случае если такая учетная запись существует."
 )
+
+# Sites settings
+SITE_ID = 1
