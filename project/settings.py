@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     "rest_framework",
     "rest_framework_simplejwt",
     "users",
+    "backend",
 ]
 
 MIDDLEWARE = [
@@ -134,7 +135,11 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 AUTH_USER_MODEL = "users.UserModel"
 
 # Rest Framework settings
-REST_FRAMEWORK = {"DEFAULT_AUTHENTICATION_CLASSES": ("rest_framework_simplejwt.authentication.JWTAuthentication",)}
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": ("rest_framework_simplejwt.authentication.JWTAuthentication",),
+    "DEFAULT_PAGINATION_CLASS": "project.pagination.CustomPageNumberPaginator",
+    "PAGE_SIZE": 50,
+}
 
 # Simple JWT settings
 SIMPLE_JWT = {"ACCESS_TOKEN_LIFETIME": ENV_SETTINGS.ACCESS_TOKEN_LIFETIME}
