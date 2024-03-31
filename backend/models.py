@@ -22,3 +22,4 @@ class ParameterModel(models.Model):
     class Meta:
         verbose_name = "Параметр"
         verbose_name_plural = "Параметры"
+        ordering = ["id"]

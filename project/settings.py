@@ -31,7 +31,7 @@ SECRET_KEY = "django-insecure-h()!_a*658bw$=7=!vb^iz%8k8srxdkrfo&e!68xn2f0^@4&hb
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ENV_SETTINGS.ALLOWED_HOSTS
 
 # Application definition
 
@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     "django.contrib.sites",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "corsheaders",
     "rest_framework",
     "rest_framework_simplejwt",
     "users",
@@ -57,6 +58,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
 ]
 
 ROOT_URLCONF = "project.urls"
@@ -137,8 +139,6 @@ AUTH_USER_MODEL = "users.UserModel"
 # Rest Framework settings
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": ("rest_framework_simplejwt.authentication.JWTAuthentication",),
-    "DEFAULT_PAGINATION_CLASS": "project.pagination.CustomPageNumberPaginator",
-    "PAGE_SIZE": 50,
 }
 
 # Simple JWT settings
@@ -170,3 +170,6 @@ DEFAULT_PASSWORD_RESET_MESSAGE = (
 
 # Sites settings
 SITE_ID = 1
+
+# CORS
+CORS_ALLOW_ALL_ORIGINS = True

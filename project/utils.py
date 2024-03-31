@@ -22,6 +22,7 @@ class EnvSettings(BaseSettings):
     EMAIL_PORT: int
     EMAIL_HOST_USER: EmailStr
     EMAIL_HOST_PASSWORD: str
+    ALLOWED_HOSTS: list[str]
 
     @property
     def ACCESS_TOKEN_LIFETIME(self) -> timedelta:
