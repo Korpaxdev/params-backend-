@@ -3,7 +3,12 @@ from rest_framework import generics, permissions
 from rest_framework.response import Response
 
 from users.models import PasswordResetTokenModel
-from users.serializers import UserSerializer, PasswordResetSerializer, PasswordResetCompleteSerializer
+from users.serializers import (
+    UserSerializer,
+    PasswordResetSerializer,
+    PasswordResetCompleteSerializer,
+    PasswordChangeSerializer,
+)
 from users.tasks import send_password_reset_email
 
 
@@ -20,6 +25,20 @@ class UserProfileView(generics.RetrieveAPIView, generics.UpdateAPIView):
 
     def get_object(self):
         return self.request.user
+
+
+class UserProfilePasswordChangeView(generics.GenericAPIView):
+    permission_classes = (permissions.IsAuthenticated,)
+    serializer_class = PasswordChangeSerializer
+
+    def get_object(self):
+        return self.request.user
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data, instance=self.get_object())
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
 
 
 class ResetPasswordView(generics.GenericAPIView):
