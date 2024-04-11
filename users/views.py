@@ -48,7 +48,7 @@ class ResetPasswordView(generics.GenericAPIView):
         serializer: PasswordResetSerializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        send_password_reset_email.delay(serializer.data["email"])
+        send_password_reset_email.delay(serializer.validated_data["email"], serializer.validated_data.get("next"))
         return Response(serializer.data)
 
 

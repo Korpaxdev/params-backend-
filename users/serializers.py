@@ -48,6 +48,7 @@ class PasswordChangeSerializer(serializers.ModelSerializer):
 
 class PasswordResetSerializer(serializers.Serializer):
     email = serializers.EmailField()
+    next = serializers.URLField(allow_null=True, allow_blank=True, required=False, write_only=True)
     message = serializers.CharField(read_only=True, default=settings.DEFAULT_PASSWORD_RESET_MESSAGE)
 
     def save(self):
@@ -63,18 +64,18 @@ class PasswordResetSerializer(serializers.Serializer):
 
 
 class PasswordResetCompleteSerializer(serializers.ModelSerializer):
+    new_password = serializers.CharField(write_only=True)
 
     @staticmethod
-    def validate_password(password: str):
+    def validate_new_password(password: str):
         return serializer_validate_password(password)
 
     def update(self, instance: UserModel, validated_data):
-        instance.set_password(validated_data["password"])
+        instance.set_password(validated_data["new_password"])
         instance.save()
         return instance
 
     class Meta:
         model = get_user_model()
-        fields = ("id", "username", "email", "password")
+        fields = ("id", "username", "email", "new_password")
         read_only_fields = ("id", "username", "email")
-        extra_kwargs = {"password": {"write_only": True}}

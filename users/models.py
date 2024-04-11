@@ -7,7 +7,7 @@ from django.utils import timezone
 
 
 # Create your models here.
-def _get_password_expired_time(self):
+def _get_password_expired_time():
     return timezone.now() + settings.PASSWORD_RESET_TOKEN_LIFETIME
 
 
