@@ -21,7 +21,9 @@ class ToDeleteParametersView(generics.GenericAPIView):
 
     def post(self, request: Request, *args, **kwargs):
         instances = self.get_queryset()
-        serializer = self.serializer_class(instances, data=request.data, allow_empty=False, many=True)
+        serializer = self.serializer_class(
+            instances, data=request.data, allow_empty=False, many=True, context={"request": request}
+        )
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data)

@@ -1,6 +1,8 @@
 from rest_framework import serializers
 
 from backend.models import ParameterModel, BufferedParameterModel
+from backend.utils import get_sync_logger
+from users.models import UserModel
 
 
 class ParameterSerializer(serializers.ModelSerializer):
@@ -29,6 +31,9 @@ class ToDeleteParameterListSerializer(serializers.ListSerializer):
         for instance in to_update:
             instance.status_delete = True
         instances.bulk_update(to_update, ["status_delete"])
+        user: UserModel = self.context.get("request").user
+        sync_logger = get_sync_logger(user)
+        sync_logger.params_marked_to_delete.add(*to_update)
         return to_update
 
 
@@ -55,6 +60,8 @@ class BufferedParameterSerializer(serializers.ModelSerializer):
         user = self.context["request"].user
         instance = self.Meta.model(**validated_data, user=user)
         instance.save()
+        sync_logger = get_sync_logger(user)
+        sync_logger.new_params.add(instance)
         return instance
 
     class Meta:

@@ -43,7 +43,24 @@ class ParameterModel(ParameterAbstractModel):
 
 class BufferedParameterModel(ParameterAbstractModel):
     user = models.ForeignKey(UserModel, on_delete=models.PROTECT, verbose_name="Пользователь")
+    sync_with_main_table = models.BooleanField(
+        default=False, auto_created=True, verbose_name="Синхронизировано с основной таблицей"
+    )
 
     class Meta:
         verbose_name = "Параметр пользователя"
         verbose_name_plural = "Параметры пользователей"
+
+
+class SyncLoggingModel(models.Model):
+    user = models.ForeignKey(UserModel, on_delete=models.PROTECT, verbose_name="Пользователь")
+    date = models.DateTimeField(auto_now=True, verbose_name="Дата синхронизации")
+    params_marked_to_delete = models.ManyToManyField(ParameterModel, verbose_name="Параметры помеченные на удаление")
+    new_params = models.ManyToManyField(BufferedParameterModel, verbose_name="Параметры добавленные пользователем")
+
+    def __str__(self):
+        return f"Логер #{self.pk}"
+
+    class Meta:
+        verbose_name = "Логер синхронизации"
+        verbose_name_plural = "Логеры синхронизации"
