@@ -1,4 +1,18 @@
 services:
+  celery:
+    restart: always
+    build:
+      dockerfile: Dockerfile
+    command: "celery -A project worker -l info"
+    env_file:
+      - ".env"
+    environment:
+      CELERY_BROKER_URL: "redis://redis"
+      CELERY_RESULT_BACKEND: "redis://redis"
+      DB_HOST: "postgres"
+    depends_on:
+      - redis
+      - postgres
   postgres:
     image: postgres:alpine
     ports:

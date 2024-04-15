@@ -12,7 +12,7 @@ from users.models import PasswordResetTokenModel, UserModel
 
 
 def check_next_url(next_url: str, password_reset_token: PasswordResetTokenModel) -> str:
-    if validate_host(urlparse(next_url).netloc, settings.ALLOWED_HOSTS):
+    if next_url and validate_host(urlparse(next_url).netloc, settings.ALLOWED_HOSTS):
         return urljoin(next_url, password_reset_token.token.__str__())
     return Site.objects.get_current().domain + reverse(
         "users:password_reset_complete", kwargs={"token": password_reset_token.token}

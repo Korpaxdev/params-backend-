@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, include
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 from users import views
@@ -17,4 +17,6 @@ urlpatterns = (
         views.ResetPasswordCompleteView.as_view(),
         name="password_reset_complete",
     ),
+    path("oauth/", include("social_django.urls", namespace="social")),
+    path("oauth/complete/", views.OauthCompleteView.as_view(), name="oauth_complete"),
 )

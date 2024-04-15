@@ -1,8 +1,20 @@
-from django.shortcuts import get_object_or_404
-from rest_framework import generics, permissions
-from rest_framework.response import Response
+from urllib.parse import urlparse
 
-from users.models import PasswordResetTokenModel
+from django.conf import settings
+from django.contrib.auth import logout
+from django.core.exceptions import ValidationError
+from django.core.validators import URLValidator
+from django.http.request import validate_host
+from django.shortcuts import get_object_or_404, redirect
+from django.utils.http import urlencode
+from requests import Session
+from rest_framework import generics, permissions
+from rest_framework.authentication import SessionAuthentication
+from rest_framework.request import Request
+from rest_framework.response import Response
+from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
+
+from users.models import PasswordResetTokenModel, UserModel
 from users.serializers import (
     UserSerializer,
     PasswordResetSerializer,
@@ -67,3 +79,46 @@ class ResetPasswordCompleteView(generics.GenericAPIView):
         serializer.save()
         password_reset_token.delete()
         return Response(serializer.data)
+
+
+class OauthCompleteView(generics.GenericAPIView):
+    authentication_classes = [SessionAuthentication]
+    permission_classes = [permissions.IsAuthenticated]
+    url_validator = URLValidator()
+
+    def get(self, request: Request, *args, **kwargs):
+        redirect_url = self.build_redirect_url()
+        redirect_response = redirect("parameters")
+        if redirect_url:
+            token_params = self.get_tokens(request.user)
+            redirect_response = redirect(redirect_url + f"?{token_params}")
+        logout(request)
+        return redirect_response
+
+    def build_redirect_url(self):
+        session: Session = self.request.session
+        next_url = str(session.get("next"))
+        scheme = self.get_validated_scheme(str(session.get("scheme")))
+        return self.get_redirect_url(next_url, scheme)
+
+    def get_redirect_url(self, next_url, scheme):
+        scheme = str(scheme) if scheme else "http"
+        try:
+            redirect_url = f"{scheme}://{next_url}"
+            self.url_validator(redirect_url)
+            netlog = urlparse(redirect_url).netloc
+            if validate_host(netlog, settings.ALLOWED_HOSTS):
+                return redirect_url
+        except ValidationError:
+            return None
+
+    @staticmethod
+    def get_tokens(user: UserModel):
+        tokens = {"refresh": RefreshToken.for_user(user), "access": AccessToken.for_user(user)}
+        return urlencode(tokens)
+
+    @staticmethod
+    def get_validated_scheme(value: str):
+        if value in ["http", "https"]:
+            return value
+        return "http"

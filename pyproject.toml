@@ -17,6 +17,7 @@ celery = "^5.3.6"
 redis = "^5.0.3"
 pydantic = {extras = ["email"], version = "^2.6.3"}
 django-cors-headers = "^4.3.1"
+social-auth-app-django = "^5.4.0"
 
 
 [build-system]

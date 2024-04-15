@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "corsheaders",
+    "social_django",
     "rest_framework",
     "rest_framework_simplejwt",
     "users",
@@ -173,3 +174,29 @@ SITE_ID = 1
 
 # CORS
 CORS_ALLOW_ALL_ORIGINS = True
+
+# Social Auth
+SOCIAL_AUTH_JSONFIELD_ENABLED = True
+
+AUTHENTICATION_BACKENDS = (
+    "social_core.backends.google.GoogleOAuth2",
+    "django.contrib.auth.backends.ModelBackend",
+)
+SOCIAL_AUTH_URL_NAMESPACE = "users:social"
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = ENV_SETTINGS.SOCIAL_AUTH_GOOGLE_OAUTH2_KEY
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = ENV_SETTINGS.SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET
+SOCIAL_AUTH_GOOGLE_OAUTH2_SCOPE = [
+    "email",
+]
+SOCIAL_AUTH_PIPELINE = (
+    "social_core.pipeline.social_auth.social_details",
+    "social_core.pipeline.social_auth.social_uid",
+    "social_core.pipeline.social_auth.social_user",
+    "social_core.pipeline.user.get_username",
+    "social_core.pipeline.social_auth.associate_by_email",
+    "social_core.pipeline.user.create_user",
+    "social_core.pipeline.social_auth.associate_user",
+    "social_core.pipeline.social_auth.load_extra_data",
+    "social_core.pipeline.user.user_details",
+)
+SOCIAL_AUTH_LOGIN_REDIRECT_URL = "users:oauth_complete"

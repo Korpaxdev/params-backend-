@@ -23,6 +23,8 @@ class EnvSettings(BaseSettings):
     EMAIL_HOST_USER: EmailStr
     EMAIL_HOST_PASSWORD: str
     ALLOWED_HOSTS: list[str]
+    SOCIAL_AUTH_GOOGLE_OAUTH2_KEY: str
+    SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET: str
 
     @property
     def ACCESS_TOKEN_LIFETIME(self) -> timedelta:
