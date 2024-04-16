@@ -5,6 +5,7 @@ from users import views
 
 app_name = "users"
 
+
 urlpatterns = (
     path("register/", views.UserRegisterView.as_view(), name="register"),
     path("profile/", views.UserProfileView.as_view(), name="user_profile"),
@@ -17,6 +18,7 @@ urlpatterns = (
         views.ResetPasswordCompleteView.as_view(),
         name="password_reset_complete",
     ),
+    path(f"oauth/login/<str:backend>/", views.auth, name="begin"),
     path("oauth/", include("social_django.urls", namespace="social")),
     path("oauth/complete/", views.OauthCompleteView.as_view(), name="oauth_complete"),
 )

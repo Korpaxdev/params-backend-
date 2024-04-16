@@ -1,18 +1,22 @@
 from urllib.parse import urlparse
 
 from django.conf import settings
-from django.contrib.auth import logout
+from django.contrib.auth import logout, REDIRECT_FIELD_NAME
 from django.core.exceptions import ValidationError
 from django.core.validators import URLValidator
 from django.http.request import validate_host
 from django.shortcuts import get_object_or_404, redirect
 from django.utils.http import urlencode
+from django.views.decorators.cache import never_cache
 from requests import Session
 from rest_framework import generics, permissions
 from rest_framework.authentication import SessionAuthentication
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework_simplejwt.tokens import RefreshToken, AccessToken
+from social_core.actions import do_auth
+from social_core.utils import setting_name
+from social_django.utils import psa, maybe_require_post
 
 from users.models import PasswordResetTokenModel, UserModel
 from users.serializers import (
@@ -23,8 +27,8 @@ from users.serializers import (
 )
 from users.tasks import send_password_reset_email
 
-
 # Create your views here.
+NAMESPACE = getattr(settings, setting_name("URL_NAMESPACE"), None) or "social"
 
 
 class UserRegisterView(generics.CreateAPIView):
@@ -122,3 +126,12 @@ class OauthCompleteView(generics.GenericAPIView):
         if value in ["http", "https"]:
             return value
         return "http"
+
+
+@never_cache
+@maybe_require_post
+@psa(f"{NAMESPACE}:complete")
+def auth(request, backend):
+    if request.user.is_authenticated:
+        logout(request)
+    return do_auth(request.backend, redirect_name=REDIRECT_FIELD_NAME)
