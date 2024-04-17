@@ -106,6 +106,8 @@ class SyncLoggingAdmin(admin.ModelAdmin):
     fields = ("user", "date")
     readonly_fields = ("date",)
     list_display_links = ("pk", "user")
+    list_filter = ("date",)
+    search_fields = ("user__username",)
 
     @admin.display(description="Количество параметров на удаление")
     def count_of_marked_to_delete(self, instance: SyncLoggingModel):
