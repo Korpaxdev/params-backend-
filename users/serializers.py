@@ -7,6 +7,10 @@ from users.models import PasswordResetTokenModel, UserModel
 
 
 class UserSerializer(serializers.ModelSerializer):
+    """Сериализатор для:
+    - Создания нового пользователя.
+    - Получения информации о пользователе
+    """
 
     def create(self, validated_data):
         return get_user_model().objects.create_user(**validated_data)
@@ -21,7 +25,19 @@ class UserSerializer(serializers.ModelSerializer):
         extra_kwargs = {"password": {"write_only": True}, "id": {"read_only": True}}
 
 
+class UserUpdateSerializer(serializers.ModelSerializer):
+    """Сериализатор для обновления информации о пользователе"""
+
+    class Meta:
+        model = get_user_model()
+        fields = ("id", "username", "email")
+        read_only_fields = ("id",)
+
+
 class PasswordChangeSerializer(serializers.ModelSerializer):
+    """Сериализатор для обновления пароля пользователя.
+    Проверяется соответствие old_password паролю в бд"""
+
     old_password = serializers.CharField(write_only=True)
     new_password = serializers.CharField(write_only=True)
 
@@ -47,6 +63,12 @@ class PasswordChangeSerializer(serializers.ModelSerializer):
 
 
 class PasswordResetSerializer(serializers.Serializer):
+    """Сериализатор для сброса пароля.
+    :param email - email адрес на который должно быть отправлено письмо.
+    :param next - URL, который должен быть вставлен в письмо.
+    :param message - сообщение, которое будет сгенерировано автоматически после создания записи
+    """
+
     email = serializers.EmailField()
     next = serializers.URLField(allow_null=True, allow_blank=True, required=False, write_only=True)
     message = serializers.CharField(read_only=True, default=settings.DEFAULT_PASSWORD_RESET_MESSAGE)
@@ -64,6 +86,10 @@ class PasswordResetSerializer(serializers.Serializer):
 
 
 class PasswordResetCompleteSerializer(serializers.ModelSerializer):
+    """
+    Сериализатор для завершающего этапа сброса пароля
+    """
+
     new_password = serializers.CharField(write_only=True)
 
     @staticmethod

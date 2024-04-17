@@ -1,0 +1,44 @@
+services:
+  app:
+    restart: always
+    build:
+      dockerfile: Dockerfile
+    command: "sh ./app-entry-point.sh"
+    ports:
+      - 8000:8000
+    depends_on:
+      celery:
+        condition: service_started
+      postgres:
+        condition: service_healthy
+    env_file:
+      - ".env"
+  celery:
+    restart: always
+    build:
+      dockerfile: Dockerfile
+    command: "celery -A project worker -l info"
+    env_file:
+      - ".env"
+    depends_on:
+      - redis
+      - postgres
+  postgres:
+    image: postgres:alpine
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_USER_PASSWORD}
+    volumes:
+      - ./database:/var/lib/postgresql/data
+    healthcheck:
+      test: "pg_isready -d ${DB_NAME} -U ${DB_USER}"
+      interval: 5s
+      timeout: 10s
+      retries: 120
+  redis:
+    image: redis:alpine
+    ports:
+      - 6379:6379

@@ -6,6 +6,7 @@ from users.models import UserModel
 
 
 class ParameterSerializer(serializers.ModelSerializer):
+    """Сериализатор для представления ParameterModel"""
 
     class Meta:
         model = ParameterModel
@@ -25,6 +26,8 @@ class ParameterSerializer(serializers.ModelSerializer):
 
 
 class ToDeleteParameterListSerializer(serializers.ListSerializer):
+    """Сериализатор для ToDeleteParameterSerializer. Помечает список параметров на удаление"""
+
     def update(self, instances, validated_data):
         ids = [data["id"] for data in validated_data]
         to_update = instances.filter(id__in=ids)
@@ -38,6 +41,8 @@ class ToDeleteParameterListSerializer(serializers.ListSerializer):
 
 
 class ToDeleteParameterSerializer(serializers.ModelSerializer):
+    """Сериализатор для создания параметров помеченных на удаление"""
+
     id = serializers.IntegerField()
 
     def validate_id(self, value):
@@ -56,6 +61,8 @@ class ToDeleteParameterSerializer(serializers.ModelSerializer):
 
 
 class BufferedParameterSerializer(serializers.ModelSerializer):
+    """Сериализатор для создания параметров созданных пользователем"""
+
     def create(self, validated_data):
         user = self.context["request"].user
         instance = self.Meta.model(**validated_data, user=user)

@@ -12,6 +12,9 @@ from users.models import PasswordResetTokenModel, UserModel
 
 
 def check_next_url(next_url: str, password_reset_token: PasswordResetTokenModel) -> str:
+    """Проверяет next_url. В случае если его netloc есть в ALLOWED_HOSTS,
+    то добавляет к нему сгенерированный токен, если нет то генерирует стандартный URL по смене пароля.
+    Стандартный URL состоит из имени домена из таблицы Site + users:password_reset_complete"""
     if next_url and validate_host(urlparse(next_url).netloc, settings.ALLOWED_HOSTS):
         return urljoin(next_url, password_reset_token.token.__str__())
     return Site.objects.get_current().domain + reverse(
@@ -21,6 +24,11 @@ def check_next_url(next_url: str, password_reset_token: PasswordResetTokenModel)
 
 @shared_task
 def send_password_reset_email(email_to: str, next_url: str):
+    """Celery Task отправляет email пользователя с url для сброса пароля.
+    Шаблон для email - users/email_templates/password_reset.html
+    :param email_to: email пользователя для отправки письма
+    :param next_url: url для восстановления пароля
+    """
     try:
         password_reset_token = PasswordResetTokenModel.objects.get(user__email=email_to)
         user = password_reset_token.user

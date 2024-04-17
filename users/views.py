@@ -24,30 +24,43 @@ from users.serializers import (
     PasswordResetSerializer,
     PasswordResetCompleteSerializer,
     PasswordChangeSerializer,
+    UserUpdateSerializer,
 )
 from users.tasks import send_password_reset_email
 
-# Create your views here.
+# Пространство имен для корректной работы auth
 NAMESPACE = getattr(settings, setting_name("URL_NAMESPACE"), None) or "social"
 
 
 class UserRegisterView(generics.CreateAPIView):
+    """Регистрация пользователей"""
+
     serializer_class = UserSerializer
 
 
 class UserProfileView(generics.RetrieveAPIView, generics.UpdateAPIView):
+    """Получение и обновление информации о текущем авторизированном пользователе"""
+
     permission_classes = (permissions.IsAuthenticated,)
-    serializer_class = UserSerializer
+
+    def get_serializer_class(self):
+        if self.request.method in ("PUT", "PATCH"):
+            return UserUpdateSerializer
+        return UserSerializer
 
     def get_object(self):
+        """Получение текущего авторизированного пользователя"""
         return self.request.user
 
 
 class UserProfilePasswordChangeView(generics.GenericAPIView):
+    """Изменение пароля текущего авторизированного пользователя"""
+
     permission_classes = (permissions.IsAuthenticated,)
     serializer_class = PasswordChangeSerializer
 
     def get_object(self):
+        """Получение текущего авторизированного пользователя"""
         return self.request.user
 
     def post(self, request, *args, **kwargs):
@@ -58,6 +71,8 @@ class UserProfilePasswordChangeView(generics.GenericAPIView):
 
 
 class ResetPasswordView(generics.GenericAPIView):
+    """Сброс пароля пользователя по email"""
+
     serializer_class = PasswordResetSerializer
 
     def post(self, request, *args, **kwargs):
@@ -69,10 +84,13 @@ class ResetPasswordView(generics.GenericAPIView):
 
 
 class ResetPasswordCompleteView(generics.GenericAPIView):
+    """Сброс пароля пользователя (завершающий этап, по сгенерированному токену)"""
+
     serializer_class = PasswordResetCompleteSerializer
     queryset = PasswordResetTokenModel.objects.all()
 
     def get_object(self) -> PasswordResetTokenModel:
+        """Получение модели токена. В случае отсутствия соответствия выдается 404"""
         token = self.kwargs["token"]
         return get_object_or_404(self.queryset, token=token)
 
@@ -86,6 +104,8 @@ class ResetPasswordCompleteView(generics.GenericAPIView):
 
 
 class OauthCompleteView(generics.GenericAPIView):
+    """Завершающий этап Oauth авторизации. Генерирует URL для редиректа"""
+
     authentication_classes = [SessionAuthentication]
     permission_classes = [permissions.IsAuthenticated]
     url_validator = URLValidator()
@@ -100,12 +120,14 @@ class OauthCompleteView(generics.GenericAPIView):
         return redirect_response
 
     def build_redirect_url(self):
+        """Создает URL для редиректа на основе параметров next и scheme в сессии"""
         session: Session = self.request.session
         next_url = str(session.get("next"))
         scheme = self.get_validated_scheme(str(session.get("scheme")))
         return self.get_redirect_url(next_url, scheme)
 
-    def get_redirect_url(self, next_url, scheme):
+    def get_redirect_url(self, next_url: str, scheme: str):
+        """Строит URL на основе параметров next_url и scheme."""
         scheme = str(scheme) if scheme else "http"
         try:
             redirect_url = f"{scheme}://{next_url}"
@@ -118,11 +140,13 @@ class OauthCompleteView(generics.GenericAPIView):
 
     @staticmethod
     def get_tokens(user: UserModel):
+        """Создает токены access и refresh для пользователя user"""
         tokens = {"refresh": RefreshToken.for_user(user), "access": AccessToken.for_user(user)}
         return urlencode(tokens)
 
     @staticmethod
     def get_validated_scheme(value: str):
+        """Получает валидную схему"""
         if value in ["http", "https"]:
             return value
         return "http"
@@ -132,6 +156,8 @@ class OauthCompleteView(generics.GenericAPIView):
 @maybe_require_post
 @psa(f"{NAMESPACE}:complete")
 def auth(request, backend):
+    """Расширенная функция для входа по oauth.
+    Во избежания конфликтов сессии, функционал был расширен logout если пользователь уже авторизирован"""
     if request.user.is_authenticated:
         logout(request)
     return do_auth(request.backend, redirect_name=REDIRECT_FIELD_NAME)

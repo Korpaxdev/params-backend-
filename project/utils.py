@@ -8,7 +8,10 @@ from rest_framework import serializers
 
 
 class EnvSettings(BaseSettings):
+    """Чтение и валидация .env файла"""
+
     model_config = SettingsConfigDict(env_file=".env")
+    DEBUG: bool = False
     DB_NAME: str
     DB_USER: str
     DB_USER_PASSWORD: str
@@ -36,6 +39,7 @@ class EnvSettings(BaseSettings):
 
 
 def map_str_to_timedelta(date_str: str) -> timedelta:
+    """Маппинг строки с датой в timedelta"""
     unit_mapping = {
         "days": "days",
         "day": "days",
@@ -51,6 +55,7 @@ def map_str_to_timedelta(date_str: str) -> timedelta:
 
 
 def serializer_validate_password(password: str) -> str:
+    """Валидация пароля"""
     try:
         validate_password(password)
     except ValidationError as error:

@@ -10,11 +10,15 @@ from users.models import UserModel, PasswordResetTokenModel
 
 @admin.register(UserModel)
 class CustomUserAdmin(UserAdmin):
+    """Админ панель для управления пользователями"""
+
     pass
 
 
 @admin.register(PasswordResetTokenModel)
 class PasswordResetTokenModelAdmin(admin.ModelAdmin):
+    """Админ панель для управления токенами для сброса пароля"""
+
     readonly_fields = ("token", "created", "is_expired")
     list_display = ("token", "user", "created", "expired", "is_expired")
     search_fields = ("user__username", "user__email", "token")

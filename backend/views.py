@@ -10,11 +10,15 @@ from backend.serializers import ParameterSerializer, ToDeleteParameterSerializer
 
 
 class ParametersView(generics.ListAPIView):
+    """Получение списка параметров"""
+
     serializer_class = ParameterSerializer
     queryset = ParameterModel.objects.all()
 
 
 class ToDeleteParametersView(generics.GenericAPIView):
+    """Помечает список параметров на удаление"""
+
     serializer_class = ToDeleteParameterSerializer
     queryset = ParameterModel.objects.all()
     permission_classes = (permissions.IsAuthenticated,)
@@ -30,6 +34,8 @@ class ToDeleteParametersView(generics.GenericAPIView):
 
 
 class CreateBufferedParameterView(generics.CreateAPIView):
+    """Создает список параметров пользователя"""
+
     serializer_class = BufferedParameterSerializer
     queryset = BufferedParameterModel.objects.all()
     permission_classes = (permissions.IsAuthenticated,)

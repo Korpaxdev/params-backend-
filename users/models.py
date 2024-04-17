@@ -12,10 +12,14 @@ def _get_password_expired_time():
 
 
 class UserModel(AbstractUser):
+    """Расширенная модель пользователя"""
+
     email = models.EmailField(unique=True, verbose_name="Email адрес")
 
 
 class PasswordResetTokenModel(models.Model):
+    """Модель токена для сброса пароля"""
+
     token = models.UUIDField(default=uuid.uuid4, editable=False, verbose_name="Токен")
     user = models.OneToOneField(UserModel, on_delete=models.CASCADE, verbose_name="Пользователь")
     created = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")

@@ -9,6 +9,8 @@ from backend.models import ParameterModel, BufferedParameterModel, SyncLoggingMo
 
 
 class SyncLoggingParamsTabularInline(admin.TabularInline):
+    """TabularInline для параметров помеченных на удаление (модель ParameterModel)"""
+
     model = SyncLoggingModel.params_marked_to_delete.through
     verbose_name = "Параметр помеченный на удаление"
     verbose_name_plural = "Параметры помеченные на удаление"
@@ -17,6 +19,8 @@ class SyncLoggingParamsTabularInline(admin.TabularInline):
 
 
 class SyncLoggingNewParamsTabularInline(admin.TabularInline):
+    """TabularInline для параметров созданных пользователем (модель BufferedParameterModel)"""
+
     model = SyncLoggingModel.new_params.through
     verbose_name = "Параметр добавленный пользователем"
     verbose_name_plural = "Параметры добавленные пользователем"
@@ -26,6 +30,8 @@ class SyncLoggingNewParamsTabularInline(admin.TabularInline):
 
 @admin.register(ParameterModel)
 class ParameterModelAdmin(admin.ModelAdmin):
+    """Админ панель для модели ParameterModel"""
+
     list_display = ("pk", "cat_id", "name", "rus_name", "date", "status_delete")
     list_display_links = ("pk", "cat_id", "name")
     search_fields = ("cat_id", "name", "rus_name")
@@ -43,6 +49,8 @@ class ParameterModelAdmin(admin.ModelAdmin):
 
 @admin.register(BufferedParameterModel)
 class BufferedParametersModelAdmin(admin.ModelAdmin):
+    """Админ панель для модели BufferedParameterModel"""
+
     list_display = ("pk", "cat_id", "name", "rus_name", "date", "status_delete", "user", "sync_with_main_table")
     list_display_links = ("pk", "cat_id", "name")
     search_fields = ("cat_id", "name", "rus_name", "user__username")
@@ -52,10 +60,14 @@ class BufferedParametersModelAdmin(admin.ModelAdmin):
 
     @admin.action(description="Добавить параметры в основную таблицу")
     def add_params(self, request, queryset: QuerySet[BufferedParameterModel]):
+        """Добавляет отмеченные параметры из модели BufferedParameterModel в ParameterModel.
+        Параметры у которых статус sync_with_main_table=True пропускаются.
+        """
         fields = [field.name for field in ParameterModel._meta.fields if field.name not in ("id", "pk", "date")]
         params_to_table = []
         no_sync_params = []
         synced_params = []
+
         for param in queryset:
             if param.sync_with_main_table:
                 no_sync_params.append(param)
@@ -74,6 +86,7 @@ class BufferedParametersModelAdmin(admin.ModelAdmin):
                 f"Параметры с id - {params_to_table_ids_str} были успешно добавлены в основную таблицу",
                 messages.SUCCESS,
             )
+
         if no_sync_params:
             params_no_sync_ids_str = ",".join([str(param.pk) for param in no_sync_params])
             self.message_user(
@@ -86,6 +99,8 @@ class BufferedParametersModelAdmin(admin.ModelAdmin):
 
 @admin.register(SyncLoggingModel)
 class SyncLoggingAdmin(admin.ModelAdmin):
+    """Админ панель для логера пользователей"""
+
     inlines = (SyncLoggingParamsTabularInline, SyncLoggingNewParamsTabularInline)
     list_display = ("pk", "user", "date", "count_of_marked_to_delete", "count_of_new_params")
     fields = ("user", "date")

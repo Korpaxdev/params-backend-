@@ -2,6 +2,8 @@ from django.contrib import admin
 
 
 class PasswordResetTokenIsExpiredFilter(admin.SimpleListFilter):
+    """Фильтр для истечения срока действия токена для сброса пароля"""
+
     title = "Истек"
     parameter_name = "is_expired"
 
