@@ -12,8 +12,9 @@
 **Важно!** Если вы запускаете все сервисы с помощью `docker-compose-full.yml`, то в `.env` файле должны быть указанны
 параметры `DB_HOST`, `CELERY_BROKER_URL`, `CELERY_RESULT_BACKEND` в качестве названия сервисов `docker-compose-full.yml`
 файла. Если же вы запускаете, только celery, redis, postgres, то эти параметры должны уже содержать url адрес (например
-127.0.0.1)
+127.0.0.1). Более подробно [Настройка `.env` файла](docs/setup_env_file.md)
 
 ## Дополнительная документация:
 
 - [Доступные маршруты](docs/routes.md)
+- [Настройка `.env` файла](docs/setup_env_file.md)
