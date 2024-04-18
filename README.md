@@ -17,4 +17,4 @@
 ## Дополнительная документация:
 
 - [Доступные маршруты](docs/routes.md)
-- [Настройка `.env` файла](docs/setup_env_file.md)
+- [Настройка .env файла](docs/setup_env_file.md)
