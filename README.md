@@ -20,3 +20,4 @@
 
 - [Доступные маршруты](docs/routes.md)
 - [Настройка .env файла](docs/setup_env_file.md)
+- [Дополнительная информация](docs/additional.md)
